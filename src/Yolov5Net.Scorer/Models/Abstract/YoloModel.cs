@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Yolov5Net.Scorer.Models.Abstract
 {
@@ -24,5 +26,18 @@ namespace Yolov5Net.Scorer.Models.Abstract
         public abstract string[] Outputs { get; set; }
         public abstract List<YoloLabel> Labels { get; set; }
         public abstract bool UseDetect { get; set; }
+
+        public virtual void LoadLabelFromTxtFile(string txtFile)
+        {
+            if (!File.Exists(txtFile))
+            {
+                throw new FileNotFoundException(txtFile);
+            }
+
+            var labels = File.ReadLines(txtFile).Select((line, index) => new YoloLabel { Id = index, Name = line });
+            Labels.AddRange(labels);
+            Dimensions = this.Labels.Count + 5;
+        }
+
     }
 }
